@@ -9,7 +9,13 @@ public static class DataStreamParser {
         return line.ToCharArray().ToObservable();
     }
 
-    public static int FindStartOfPacketMarker(this IObservable<char> dataStream, int numUniqueChars) {
+    public static int FindStartOfPacketPosition(this IObservable<char> dataStream) => 
+        dataStream.FindPositionOfFirstUniqueCharacters(4);
+
+    public static int FindStartOfMessagePosition(this IObservable<char> dataStream) =>
+        dataStream.FindPositionOfFirstUniqueCharacters(14);
+
+    private static int FindPositionOfFirstUniqueCharacters(this IObservable<char> dataStream, int numUniqueChars) {
         return Observable.Generate(1, _ => true, x => x + 1, x => x)
             .Zip(dataStream, (i, c) => (Index: i, Character: c))
             .Buffer(numUniqueChars, 1)

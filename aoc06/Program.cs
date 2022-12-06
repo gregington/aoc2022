@@ -1,8 +1,11 @@
 ﻿public class Program {
     public static void Main(string[] args) {
-        var startOfPacket = DataStreamParser.GetCharacterObservable(args[0])
-            .FindStartOfPacketMarker(4);
+        var dataStream = DataStreamParser.GetCharacterObservable(args[0]);
+            
+        var startOfPacketPosition = dataStream.FindStartOfPacketPosition();
+        Console.WriteLine($"Start of packet position: {startOfPacketPosition}");
 
-        Console.WriteLine($"Start of packet marker: {startOfPacket}");
+        var startOfMessagePosition = dataStream.FindStartOfMessagePosition();
+        Console.WriteLine($"Start of message position: {startOfMessagePosition}");
     }
 }
