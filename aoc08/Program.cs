@@ -6,5 +6,8 @@ public class Program {
 
         var numVisible = VisiblityCalculator.NumberVisible(grid);
         Console.WriteLine($"Number of trees visible: {numVisible}");
+
+        var maxScenicScore = ScenicScoreCalculator.CalculateMax(grid);
+        Console.WriteLine($"Max scenic score: {maxScenicScore}");
     }
 }
