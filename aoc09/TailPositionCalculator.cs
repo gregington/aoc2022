@@ -2,23 +2,26 @@ using System.Collections.Immutable;
 
 public static class TailPositionCalculator {
 
-    public static ImmutableHashSet<(int X, int Y)> Calculate(IEnumerable<(int XIncrement, int YIncrement)> moves) {
-        var initialState = (Visited: new HashSet<(int X, int Y)>{(0, 0)}.ToImmutableHashSet(), Tail: (X: 0, Y: 0), Head: (X: 0, Y: 0 ));
+    public static ImmutableHashSet<(int X, int Y)> Calculate(IEnumerable<(int XIncrement, int YIncrement)> moves, int numKnots) {
+        var knots = Enumerable.Repeat((X: 0, Y: 0), numKnots).ToImmutableArray();
+        var initialState = (Visited: new HashSet<(int X, int Y)>{(0, 0)}.ToImmutableHashSet(), Knots: knots);
 
         var endState = moves.Aggregate(initialState, (state, move) => Move(move, state));
         return endState.Visited;
     }
 
-    private static (ImmutableHashSet<(int X, int Y)> Visited, (int X, int Y) Head, (int X, int Y) Tail) Move(
-        (int XIncrement, int YIncrement) move, (ImmutableHashSet<(int X, int Y)> Visited, (int X, int Y) Head, (int X, int Y) Tail) state) {
+    private static (ImmutableHashSet<(int X, int Y)> Visited, ImmutableArray<(int X, int Y)> Knots) Move(
+        (int XIncrement, int YIncrement) move, (ImmutableHashSet<(int X, int Y)> Visited, ImmutableArray<(int X, int Y)> Knots) state) {
 
-        var (visited, head, tail) = state;
-        var newHead = (X: head.X + move.XIncrement, Y: head.Y + move.YIncrement);
-        var newTail = CalculateTailPosition(newHead, tail);
-        return (visited.Add(newTail), newHead, newTail);
+        var (visited, knots) = state;
+        var newKnots = new [] {(X: knots[0].X + move.XIncrement, Y: knots[0].Y + move.YIncrement)}.ToImmutableArray();
+        for (int i = 1; i < knots.Length; i++) {
+            newKnots = newKnots.Add(CalculateNextPosition(newKnots[i - 1], knots[i]));
+        }
+        return (visited.Add(newKnots.Last()), newKnots);
     }
     
-    public static (int X, int Y) CalculateTailPosition((int X, int Y) head, (int X, int Y) tail) {
+    public static (int X, int Y) CalculateNextPosition((int X, int Y) head, (int X, int Y) tail) {
         if (IsTouching(head, tail)) {
             return tail;
         }
