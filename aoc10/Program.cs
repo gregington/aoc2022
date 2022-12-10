@@ -1,6 +1,8 @@
 ﻿public class Program {
     public static void Main(string[] args) {
-        var signalStrengths = SignalStrengthCalculator.CalculateSignalStrength(args[0]);
+
+        var xValues = ValueCalculator.CalculateValues(args[0]);
+        var signalStrengths = SignalStrengthCalculator.CalculateSignalStrength(xValues);
 
         var sampledSingalStrengths = signalStrengths
             .Where(x => x.Cycle == 20 || (x.Cycle > 20 && (x.Cycle - 20) % 40 == 0));
@@ -10,5 +12,7 @@
             .Sum();
 
         Console.WriteLine($"Sum of signal strengths: {sumOfSignalStrengths}");
+        Console.WriteLine();
+        Console.WriteLine(ScreenCalculator.GetScreen(xValues));
     }
 }
