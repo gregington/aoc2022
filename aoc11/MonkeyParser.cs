@@ -16,9 +16,9 @@ public static class MonkeyParser {
         int? id = null;
         ImmutableArray<long>? items = null;
         IElement? operation = null;
-        int? divisor = null;
-        int? trueMonkey = null;
-        int? falseMonkey = null;
+        long? divisor = null;
+        int? nextMonkeyIfDivisible = null;
+        int? nextMonkeyIfNotDivisible = null;
 
         foreach (var line in lines) {
             var match = MonkeyRegex.Match(line);
@@ -53,11 +53,11 @@ public static class MonkeyParser {
                 var monkey = Convert.ToInt32(groups["monkey"].Value);
 
                 if (condition == "true") {
-                    trueMonkey = monkey;
+                    nextMonkeyIfDivisible = monkey;
                     continue;
                 }
                 if (condition == "false") {
-                    falseMonkey = monkey;
+                    nextMonkeyIfNotDivisible = monkey;
                     continue;
                 }
                 throw new ArgumentException(condition);
@@ -76,25 +76,14 @@ public static class MonkeyParser {
         if (divisor == null) {
             throw new ArgumentNullException("divisor");
         }
-        if (trueMonkey == null) {
+        if (nextMonkeyIfDivisible == null) {
             throw new ArgumentNullException("trueMonkey");
         }
-        if (falseMonkey == null) {
+        if (nextMonkeyIfNotDivisible == null) {
             throw new ArgumentNullException("falseMonkey");
         }
 
-        var throwExpression = new If(
-            new Equals(
-                new Mod(
-                    new Variable("worryValue"), 
-                    new Constant(divisor.Value)
-                ),
-                new Constant(0)
-            ), 
-            new Constant(trueMonkey.Value), 
-            new Constant(falseMonkey.Value));
-
-        return new Monkey(id.Value, items.Value, operation, throwExpression);
+        return new Monkey(id.Value, items.Value, operation, divisor.Value, nextMonkeyIfDivisible.Value, nextMonkeyIfNotDivisible.Value);
     }
 
     private static ImmutableArray<long> ParseItems(string rawItems) {

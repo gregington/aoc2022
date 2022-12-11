@@ -4,8 +4,10 @@ public record Monkey(
     int Id, 
     ImmutableArray<long> Items, 
     IElement WorryOperation, 
-    IElement NextMonkey,
-    int InspectionCount = 0) {
+    long Divisor,
+    int nextMonkeyIfDivisible,
+    int nextMonkeyIfNotDivisible,
+    long InspectionCount = 0) {
 
     public override string ToString()
     {
@@ -13,7 +15,9 @@ public record Monkey(
             $"{nameof(Id)} = {Id}",
             $"{nameof(Items)} = [{string.Join(',', Items)}]",
             $"{nameof(WorryOperation)} = {WorryOperation}",
-            $"{nameof(NextMonkey)} = {NextMonkey}",
+            $"{nameof(Divisor)} = {Divisor}",
+            $"{nameof(nextMonkeyIfDivisible)} = {nextMonkeyIfDivisible}",
+            $"{nameof(nextMonkeyIfNotDivisible)} = {nextMonkeyIfNotDivisible}",
             $"{nameof(InspectionCount)} = {InspectionCount}"
         };
 

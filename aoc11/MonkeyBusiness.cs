@@ -1,5 +1,5 @@
 public static class MonkeyBusiness {
-    public static int Calculate(IEnumerable<Monkey> monkeys, int topN) {
+    public static long Calculate(IEnumerable<Monkey> monkeys, int topN) {
         return monkeys.Select(m => m.InspectionCount)
             .OrderDescending()
             .Take(topN)
