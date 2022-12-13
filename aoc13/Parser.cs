@@ -1,8 +1,14 @@
 using System.Collections.Immutable;
 
 public static class Parser {
-    public static IEnumerable<(List<object>, List<object>)> Parse(string path) {
+    public static IEnumerable<(List<object>, List<object>)> ParsePairs(string path) {
         return Parse(File.ReadLines(path));
+    }
+
+    public static IEnumerable<List<object>> ParseLines(string path) {
+        return File.ReadLines(path)
+            .Where(x => x.Trim().Length != 0)
+            .Select(ParseLine);
     }
 
     private static IEnumerable<(List<object>, List<object>)> Parse(IEnumerable<string> lines) {
