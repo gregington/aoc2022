@@ -5,9 +5,11 @@ public class Program {
         var source = new Point(500, 0);
         var rocks = Parser.ParseRocks(args[0]);
 
-        var sand = SandDropper.Drop(rocks, source);
+        var sand1 = SandDropper1.Drop(rocks, source);
+        Console.WriteLine($"Number of grains part 1: {sand1.Count()}");
 
-        Console.WriteLine(GridPrinter.Print(rocks, sand, source));
-        Console.WriteLine($"Number of grains: {sand.Count()}");
+        var sand2 = SandDropper2.Drop(rocks, source);
+        Console.WriteLine($"Number of grains part 2: {sand2.Count()}");
+
     }
 }
