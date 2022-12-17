@@ -1,16 +1,10 @@
 using System.Collections.Immutable;
 
 public static class Shapes {
-    public static IEnumerable<ImmutableArray<byte>> ShapeEnumerator() {
-        var shapes = ShapesAsStrings()
+    public static ImmutableArray<ImmutableArray<byte>> GetShapes() {
+        return ShapesAsStrings()
             .Select(x => x.Select(StringAsBits).Reverse().ToImmutableArray())
             .ToImmutableArray();
-
-        while (true) {
-            foreach (var shape in shapes) {
-                yield return shape;
-            }
-        }
     }
 
     public static ImmutableArray<byte> Move(this ImmutableArray<byte> shape, char direction) {
