@@ -1,0 +1,1 @@
+public record struct PlayerState(string NextValve, int DistanceToValve);
