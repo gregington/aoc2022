@@ -12,6 +12,14 @@ public static class Solver {
             .Sum();
     }
 
+    public static int MultiplyGeodes(ImmutableDictionary<int, ImmutableDictionary<Resource, Cost>> blueprints, int timeLimit, int firstN) {
+        return blueprints
+            .OrderBy(kvp => kvp.Key)
+            .Take(firstN)
+            .Select(kvp => Solve(kvp.Key, kvp.Value, timeLimit))
+            .Aggregate((a, b) => a * b);
+    }
+
     public static int Solve(int blueprintNum, ImmutableDictionary<Resource, Cost> blueprint, int timeLimit) {
         ImmutableDictionary<Resource, int> resources = Enum.GetValues<Resource>()
             .ToImmutableDictionary(r => r, _ => 0);
@@ -34,65 +42,74 @@ public static class Solver {
 
         while (queue.Count() > 0) {
             var state = queue.Dequeue();
-            if (seen.Contains(state)) {
-                continue;
-            }
-            seen.Add(state);
 
             var (ore, clay, obsidian, geode, oreRobots, clayRobots, obsidianRobots, geodeRobots, timeRemaining) = state;
 
             maxGeode = Math.Max(geode, maxGeode);
 
-            if (seen.Count() % 1_000_000 == 0) {
-                Console.WriteLine($"{blueprintNum:d2} -> Seen: {seen.Count():n0}, Queue: {queue.Count():n0}, Best: {maxGeode}");
-            }
-
             if (timeRemaining <= 0) {
                 continue;
             }
 
+            if (timeRemaining * geode + Math.Max((timeRemaining - 2) * (timeRemaining - 1) / 2, 0) < maxGeode) {
+                continue;
+            }
+
+            // Cap robots to the maximum that can be spent each turn
+            oreRobots = Math.Min(oreRobots, maxSpends[Resource.Ore]);
+            clayRobots = Math.Min(clayRobots, maxSpends[Resource.Clay]);
+            obsidianRobots = Math.Min(obsidianRobots, maxSpends[Resource.Obsidian]);
+
+            ore = Math.Min(ore, timeRemaining * maxSpends[Resource.Ore] - oreRobots * (timeRemaining - 1));
+            clay = Math.Min(clay, timeRemaining * blueprint[Resource.Obsidian][Resource.Clay] - clayRobots * (timeRemaining - 1));
+            obsidian = Math.Min(obsidian, timeRemaining * blueprint[Resource.Geode][Resource.Obsidian] - obsidianRobots * (timeRemaining - 1));
+
+            state = new State(ore, clay, obsidian, geode, oreRobots, clayRobots, obsidianRobots, geodeRobots, timeRemaining);
+
+            if (seen.Contains(state)) {
+                continue;
+            }
+            seen.Add(state);
+
             var canBuild = CanBuild(blueprint, ore, clay, obsidian, geode);
-
-
-            // filter where building more robots than we can spend
 
             foreach (var build in canBuild) {
                 var cost = blueprint[build];
-                if (build == Resource.Ore && oreRobots + 1 <= maxSpends[Resource.Ore]) {
-                    queue.Enqueue(new State(
-                        ore - cost[Resource.Ore] + oreRobots, 
-                        clay - cost[Resource.Clay] + clayRobots, 
-                        obsidian -cost[Resource.Obsidian] + obsidianRobots, 
-                        geode - cost[Resource.Geode] + geodeRobots, 
-                        oreRobots + 1, clayRobots, obsidianRobots, geodeRobots, timeRemaining - 1));
-                } else if (build == Resource.Clay && clayRobots + 1 <= maxSpends[Resource.Clay]) {
-                    queue.Enqueue(new State(
-                        ore - cost[Resource.Ore] + oreRobots, 
-                        clay - cost[Resource.Clay] + clayRobots, 
-                        obsidian -cost[Resource.Obsidian] + obsidianRobots, 
-                        geode - cost[Resource.Geode] + geodeRobots, 
-                        oreRobots, clayRobots + 1, obsidianRobots, geodeRobots, timeRemaining - 1));
-                } else if (build == Resource.Obsidian && obsidianRobots + 1 <= maxSpends[Resource.Obsidian]) {
-                    queue.Enqueue(new State(
-                        ore - cost[Resource.Ore] + oreRobots, 
-                        clay - cost[Resource.Clay] + clayRobots, 
-                        obsidian -cost[Resource.Obsidian] + obsidianRobots, 
-                        geode - cost[Resource.Geode] + geodeRobots, 
-                        oreRobots, clayRobots, obsidianRobots + 1, geodeRobots, timeRemaining - 1));
-                } else if (build == Resource.Geode) {
+                if (build == Resource.Geode) {
                     queue.Enqueue(new State(
                         ore - cost[Resource.Ore] + oreRobots, 
                         clay - cost[Resource.Clay] + clayRobots, 
                         obsidian -cost[Resource.Obsidian] + obsidianRobots, 
                         geode - cost[Resource.Geode] + geodeRobots, 
                         oreRobots, clayRobots, obsidianRobots, geodeRobots + 1, timeRemaining - 1));
-                }
+                    continue;
+                } else  if (build == Resource.Ore) {
+                    queue.Enqueue(new State(
+                        ore - cost[Resource.Ore] + oreRobots, 
+                        clay - cost[Resource.Clay] + clayRobots, 
+                        obsidian -cost[Resource.Obsidian] + obsidianRobots, 
+                        geode - cost[Resource.Geode] + geodeRobots, 
+                        oreRobots + 1, clayRobots, obsidianRobots, geodeRobots, timeRemaining - 1));
+                } else if (build == Resource.Clay) {
+                    queue.Enqueue(new State(
+                        ore - cost[Resource.Ore] + oreRobots, 
+                        clay - cost[Resource.Clay] + clayRobots, 
+                        obsidian -cost[Resource.Obsidian] + obsidianRobots, 
+                        geode - cost[Resource.Geode] + geodeRobots, 
+                        oreRobots, clayRobots + 1, obsidianRobots, geodeRobots, timeRemaining - 1));
+                } else if (build == Resource.Obsidian) {
+                    queue.Enqueue(new State(
+                        ore - cost[Resource.Ore] + oreRobots, 
+                        clay - cost[Resource.Clay] + clayRobots, 
+                        obsidian -cost[Resource.Obsidian] + obsidianRobots, 
+                        geode - cost[Resource.Geode] + geodeRobots, 
+                        oreRobots, clayRobots, obsidianRobots + 1, geodeRobots, timeRemaining - 1));
+                } 
             }
             // build nothing
             queue.Enqueue(new State(ore + oreRobots, clay + clayRobots, obsidian + obsidianRobots, geode + geodeRobots, oreRobots, clayRobots, obsidianRobots, geodeRobots, timeRemaining - 1));
         }
 
-        Console.WriteLine($"{blueprintNum:d2} -> Done. Max geodes = {maxGeode}");
         return maxGeode;
     }
 
