@@ -1,14 +1,14 @@
 public class Node {
 
-    private int value;
+    private long value;
 
-    public Node(int value) {
+    public Node(long value) {
         this.value = value;
         Prev = this;
         Next = this;
     }
 
-    public int Value => value;
+    public long Value => value;
 
     public Node Prev;
     public Node Next;

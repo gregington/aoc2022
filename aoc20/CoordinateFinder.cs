@@ -1,9 +1,9 @@
 public static class CoordinateFinder {
-    public static int Find(Node head) {
+    public static long Find(Node head) {
         var zero = FindZeroNode(head);
 
         var current = zero;
-        var sum = 0;
+        var sum = 0L;
         for (var i = 0; i < 3; i++) {
             current = MoveNext(current, 1000);
             sum += current.Value;

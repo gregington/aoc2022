@@ -2,9 +2,9 @@ using System.Collections.Immutable;
 
 public static class Parser {
     
-    public static ImmutableArray<Node> Parse(string path) {
-        var values = ParseAsInts(path);
-        var nodes = values.Select(v => new Node(v)).ToImmutableArray();
+    public static ImmutableArray<Node> Parse(string path, int key) {
+        var values = ParseAsLongs(path);
+        var nodes = values.Select(v => new Node(v * key)).ToImmutableArray();
 
         for (int i = 0; i < nodes.Length; i++) {
             var node = nodes[i];
@@ -15,9 +15,9 @@ public static class Parser {
         return nodes;
     }
 
-    public static ImmutableArray<int> ParseAsInts(string path) {
+    public static ImmutableArray<long> ParseAsLongs(string path) {
         return File.ReadLines(path)
-            .Select(x => Convert.ToInt32(x))
+            .Select(x => Convert.ToInt64(x))
             .ToImmutableArray();
     }
 }
