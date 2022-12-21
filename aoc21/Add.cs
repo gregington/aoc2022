@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+
 public record struct Add : IOperation {
 
     private IExpression left;
@@ -11,8 +13,8 @@ public record struct Add : IOperation {
     public IExpression Left { get => left; }
     public IExpression Right { get => right; }
 
-    public long Evaluate() {
-        return left.Evaluate() + right.Evaluate();
+    public long Evaluate(ImmutableDictionary<string, long> variables) {
+        return left.Evaluate(variables) + right.Evaluate(variables);
     }
 
     public override string ToString() {

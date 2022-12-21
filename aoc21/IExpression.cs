@@ -1,4 +1,6 @@
+using System.Collections.Immutable;
+
 public interface IExpression {
-    long Evaluate();
+    long Evaluate(ImmutableDictionary<string, long> variables);
 
 }

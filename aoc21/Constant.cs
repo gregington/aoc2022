@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+
 public record struct Constant : IExpression {
     
     private long value;
@@ -6,7 +8,8 @@ public record struct Constant : IExpression {
         this.value = value;
     }
 
-   public long Evaluate() => value;
+    public long Value => value;
+   public long Evaluate(ImmutableDictionary<string, long> variables) => value;
 
     public override string ToString() => Convert.ToString(value);
 }
