@@ -15,6 +15,26 @@ public static class Simulator {
         }
     }
 
+    public static int SimulateUntilNoMovement(ImmutableHashSet<Point> initialElfPositions) {
+        var positions = initialElfPositions;
+        var proposalFunctionsEnumerable = Proposals.ProposalFunctionsEnumerable();
+        
+        using (var enumerator = proposalFunctionsEnumerable.GetEnumerator()) {
+            var round = 0;
+            while(true) {
+                if (!enumerator.MoveNext()) {
+                    throw new Exception("Enumerator should never end");
+                }
+                var newPositions = Round(positions, enumerator.Current);
+                round = round + 1;
+                if (newPositions.SetEquals(positions)) {
+                    return round;
+                }
+                positions = newPositions;
+            }
+        }        
+    }
+
     public static ImmutableHashSet<Point> Round(ImmutableHashSet<Point> elfPositions, ImmutableArray<Func<Point, ISet<Point>, Point?>> proposalFunctions) {
         // First half, propose
         var proposals = elfPositions.ToImmutableDictionary(

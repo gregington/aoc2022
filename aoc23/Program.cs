@@ -5,5 +5,8 @@
         var finalPositions = Simulator.Simulate(elfPositions, 10);
         var emptyTiles = EmptyTileCalculator.Calculate(finalPositions);
         Console.WriteLine($"Empty tiles: {emptyTiles}");
+
+        var firstNoMovementRound = Simulator.SimulateUntilNoMovement(elfPositions);
+        Console.WriteLine($"First round with no movement: {firstNoMovementRound}");
     }
 }
