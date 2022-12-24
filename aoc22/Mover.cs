@@ -8,7 +8,7 @@ public static class Mover {
             } else if (instruction == Instruction.Right) {
                 direction = direction.TurnRight();
             } else if (instruction == Instruction.Forward) {
-                currentSquare = currentSquare.Move(direction);
+                (currentSquare, direction) = currentSquare.Move(direction);
             }
         }
 

@@ -17,4 +17,6 @@ public static class DirectionExtensions {
             Direction.Right => Direction.Down,
             _ => throw new Exception("Unknown direction")
         };
+
+    public static Direction Reverse(this Direction direction) => direction.TurnRight().TurnRight();
 }

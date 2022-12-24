@@ -4,21 +4,22 @@ public class Square {
         X = x;
         Y = y;
         Terrain = terrain;
-        Up = this;
-        Right = this;
-        Down = this;
-        Left = this;
+        Up = (this, Direction.Up);
+        Right = (this, Direction.Right);
+        Down = (this, Direction.Down);
+        Left = (this, Direction.Left);
     }
 
     public int X { get; }
     public int Y { get; }
     public Terrain Terrain { get; }
-    public Square Up { get; set; }
-    public Square Right { get; set; }
-    public Square Down { get; set; }
-    public Square Left { get; set; }
+    
+    public (Square Square, Direction Direction) Up { get; set; }
+    public (Square Square, Direction Direction) Right { get; set; }
+    public (Square Square, Direction Direction) Down { get; set; }
+    public (Square Square, Direction Direction) Left { get; set; }
 
-    public Square Move(Direction direction) => 
+    public (Square Square, Direction Direction) Move(Direction direction) => 
         direction switch {
             Direction.Up => Up,
             Direction.Right => Right,

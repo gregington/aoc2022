@@ -4,11 +4,19 @@ public class Program {
     public static void Main(string[] args) {
         var (map, instructions) = Parser.Parse(args[0]);
 
-        var startSquare = GraphCreator.Create(map);
+        var startSquare = GraphCreator.CreateCartesian(map);
         var (x, y, direction) = Mover.Move(startSquare, Direction.Right, instructions);
         var password = PasswordGenerator.Generate(x, y, direction);
-        Console.WriteLine($"({x}, {y}, {direction})");
-        Console.WriteLine($"Password: {password}");
+        Console.WriteLine($"Row: {y}, Col: {x}, Facing: {direction} ({(int) direction})");
+        Console.WriteLine($"Password for squares: {password}");
+
+        var faceGrids = CubeMappings.FaceGrids(args[0]);
+        var faceLinks = CubeMappings.FaceLinks(args[0]);
+        var startSquareOnCube = GraphCreator.CreateCube(map, faceGrids, faceLinks);
+        var (cubeX, cubeY, cubeDirection) = Mover.Move(startSquareOnCube, Direction.Right, instructions);
+        var cubePassword = PasswordGenerator.Generate(cubeX, cubeY, cubeDirection);
+        Console.WriteLine($"Row: {cubeY}, Col: {cubeX}, Facing: {cubeDirection} ({(int) cubeDirection})");
+        Console.WriteLine($"Password for cubes: {cubePassword}");
     }
 
     private static void PrintMap(ImmutableArray<ImmutableArray<char>> map) {
