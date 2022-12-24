@@ -1,15 +1,13 @@
 public static class Simulation {
     
-    private record struct State(int Time, Point Expedition);
-
-    public static int Run(Valley valley) {
+    public static int Run(Valley valley, int numTargets) {
 
         var valleyCache = new Dictionary<int, Valley> {
             [0] = valley
         };
 
         var queue = new Queue<State>();
-        queue.Enqueue(new State(0, valley.Start));
+        queue.Enqueue(new State(0, valley.Start, 0, numTargets, valley.Goal, valley.Start));
 
         return Run(queue, valleyCache);
     }
@@ -25,11 +23,18 @@ public static class Simulation {
             }
             seen.Add(state);
 
-            var (time, expedition) = state;
+            var (time, expedition, currentTargetCount, _, _, _) = state;
+            var currentTarget = state.CurrentTarget;
             var valley = valleyCache[time];
 
-            if (expedition == valley.Goal) {
-                return time;
+            int nextTargetCount;
+            if (expedition == currentTarget) {
+                nextTargetCount = currentTargetCount + 1;
+                if (nextTargetCount >= state.MaxTargets) {
+                    return time;
+                }
+            } else {
+                nextTargetCount = currentTargetCount;
             }
 
             var nextTime = time + 1;
@@ -56,7 +61,7 @@ public static class Simulation {
                     continue;
                 }
 
-                queue.Enqueue(new State(nextTime, potentialMove));
+                queue.Enqueue(state with { Time = nextTime, Expedition = potentialMove, TargetCount = nextTargetCount });
             }
         }
         throw new Exception("Solution not found");
